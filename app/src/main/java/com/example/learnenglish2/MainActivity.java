@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-    private Button startQuiz, startWord, highScore;
+    private Button startQuiz, startWord, highScore, userGuide;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
 
         startQuiz = findViewById(R.id.btn_startquiz);
         highScore = findViewById(R.id.btn_highscore);
+        startWord = findViewById(R.id.btn_startword);
+        userGuide = findViewById(R.id.btn_userguide);
 
         startQuiz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,6 +31,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        startWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CorrectWordActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        userGuide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, UserGuideActivity.class);
                 startActivity(intent);
             }
         });

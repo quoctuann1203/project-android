@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LearnEnglish2">
         <activity
+            android:name=".UserGuideActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ScoreCorrectWordActivity"
+            android:exported="true" />
+        <activity
+            android:name=".CorrectWordActivity"
+            android:exported="true" />
+        <activity
             android:name=".HighScoreActivity"
             android:exported="true" />
         <activity
