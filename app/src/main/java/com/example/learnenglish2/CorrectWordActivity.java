@@ -1,5 +1,6 @@
 package com.example.learnenglish2;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -40,7 +41,7 @@ public class CorrectWordActivity extends AppCompatActivity {
     Integer wrongAns = 0;
     Integer levelQuestion = 3;
 
-    TextView txtCorrectAnswer, txtRightAnswer, txtQuestionContainer, txtScore, timeCountDown;
+    TextView txtCorrectAnswer, txtRightAnswer, txtQuestionContainer, txtScore, timeCountDown, txtLevel;
     EditText etUserInput;
     Button btnCheck, btnShow, btnNext;
 
@@ -49,6 +50,7 @@ public class CorrectWordActivity extends AppCompatActivity {
     MediaPlayer backgroundMp3;
 
     CountDownTimer countDown;
+    Boolean isFinish = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,8 @@ public class CorrectWordActivity extends AppCompatActivity {
         // GET DRAW QUESTION
         getRawQuestionList();
 
-//        startTimer();
+
+        startTimer();
         // initialize the random variable
 
         random = new Random();
@@ -79,21 +82,29 @@ public class CorrectWordActivity extends AppCompatActivity {
         btnCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startTimer();
                 if(etUserInput.getText().toString().equalsIgnoreCase(day)){
                     score = score + 1;
                     if(score % 3 == 0 ) {
                         star += 1;
                         txtScore.setText("" + star.toString());
-                        playCorrectSound();
                     }
-                    levelQuestion += 1;
+                    if(levelQuestion > 6) {
+                        levelQuestion = 6;
+
+                    }else {
+                        levelQuestion += 1;
+                    }
                     quizzes = getLevelQuestion(levelQuestion);
                     wrongAns = 0;
+                    playCorrectSound();
+
+                    // display dialog when got true answer
                     Dialog dialog = new Dialog(CorrectWordActivity.this);
                     dialog.setContentView(R.layout.correct_dialog);
                     Button btnHide = dialog.findViewById(R.id.btnContinue);
                     dialog.show();
+
+
 
                     btnHide.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -106,15 +117,18 @@ public class CorrectWordActivity extends AppCompatActivity {
                         }
                     });
 
-
                 }else {
                     wrongAns += 1;
                     score = 0;
-                    levelQuestion -= 1;
-                    quizzes = getLevelQuestion(levelQuestion);
 
                     Toast.makeText(CorrectWordActivity.this, "You are wrong", Toast.LENGTH_SHORT).show();
 
+                    if(levelQuestion < 0) {
+                        levelQuestion = 1;
+
+                    }else {
+                        levelQuestion -= 1;
+                    }
                     if (wrongAns == 3){
                         if(star > 0) {
                             star -= 1;
@@ -130,12 +144,21 @@ public class CorrectWordActivity extends AppCompatActivity {
                         wrongAns = 0;
 
                     }
+                    quizzes = getLevelQuestion(levelQuestion);
+                    playIncorrectSound();
                     etUserInput.setText("");
                     changeQuestion();
+//                    isFinish = true;
+
+
 //                    day = quizzes[random.nextInt(quizzes.length)];
 //                    txtQuestionContainer.setText(mixWords(day));
                 }
+                timeCountDown.setText((" "));
+                countDown.cancel();
+                startTimer();
             }
+
         });
 
         //BTN NEXT
@@ -209,6 +232,8 @@ public class CorrectWordActivity extends AppCompatActivity {
                 txtRightAnswer.setVisibility(View.VISIBLE);
 
                 txtRightAnswer.setText(day);
+                getDataFromDB();
+
             }
         });
     }
@@ -221,13 +246,15 @@ public class CorrectWordActivity extends AppCompatActivity {
         countDown = new CountDownTimer(20000, 1000) {
             @Override
             public void onTick(long mil) {
-                if(mil < 20000)
-                    timeCountDown.setText(String.valueOf(mil / 1000));
+                if(mil < 20000 ){
+                    timeCountDown.setText("" + mil / 1000);
+
+                }
             }
 
             @Override
             public void onFinish() {
-                changeQuestion();
+              btnCheck.performClick();
             }
         };
         countDown.start();
@@ -270,6 +297,7 @@ public class CorrectWordActivity extends AppCompatActivity {
         txtRightAnswer = findViewById(R.id.txtRightAnswer);
         txtQuestionContainer = findViewById(R.id.txtQuestionContainer);
         txtScore = findViewById(R.id.txtScore);
+        txtLevel = findViewById(R.id.txtLevel);
 
         etUserInput = findViewById(R.id.etUserInput);
         btnCheck = findViewById(R.id.btnCheck);
@@ -279,7 +307,8 @@ public class CorrectWordActivity extends AppCompatActivity {
 
     private String[] getLevelQuestion(int level) {
         questions.forEach(question -> {
-            if(level == question.level){
+            if(level == question.level ){
+
                 quizzes = question.question;
             }
         });
@@ -300,5 +329,11 @@ public class CorrectWordActivity extends AppCompatActivity {
         questions.add(question4);
         questions.add(question5);
         questions.add(question6);
+    }
+
+    private void getDataFromDB() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.setValue("minhdoan");
     }
 }
