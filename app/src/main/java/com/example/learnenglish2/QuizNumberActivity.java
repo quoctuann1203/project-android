@@ -48,7 +48,6 @@ public class QuizNumberActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
         loadSets();
 
-
     }
 
     private void loadSets() {

@@ -1,6 +1,7 @@
 package com.example.learnenglish2;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +33,7 @@ public class CorrectWordActivity extends AppCompatActivity {
 
 
     List<CorrectWord> questions = new ArrayList<CorrectWord>();
-    String[] quizzes;
+    List<String> quizzes;
     // Declare all other variables
 
     String day;
@@ -43,7 +45,7 @@ public class CorrectWordActivity extends AppCompatActivity {
 
     TextView txtCorrectAnswer, txtRightAnswer, txtQuestionContainer, txtScore, timeCountDown, txtLevel;
     EditText etUserInput;
-    Button btnCheck, btnShow, btnNext;
+    Button btnCheck, btnShow, btnStart;
 
     MediaPlayer correctAnswerMp3;
     MediaPlayer wrongAnswerMp3;
@@ -60,24 +62,70 @@ public class CorrectWordActivity extends AppCompatActivity {
 
         // init UI
         initUI();
+        Intent intent = getIntent();
+        Bundle args = intent.getBundleExtra("BUNDLE");
+        questions = (ArrayList<CorrectWord>) args.getSerializable("ARRAYLIST");
+        Log.i("question2", "test logggggggggggggggggggggggggggggggggggggg");
+
+
+
+
+        //hide
+//        btnCheck.setVisibility(View.INVISIBLE);
+//        btnShow.setVisibility(View.INVISIBLE);
+//        txtCorrectAnswer.setVisibility(View.INVISIBLE);
+//        txtRightAnswer.setVisibility(View.INVISIBLE);
+//        txtQuestionContainer.setVisibility(View.INVISIBLE);
+//        txtScore.setVisibility(View.INVISIBLE);
+////        timeCountDown.setVisibility(View.INVISIBLE);
+//        txtLevel.setVisibility(View.INVISIBLE);
+//        etUserInput.setVisibility(View.INVISIBLE);
+
+
 
         // GET DRAW QUESTION
-        getRawQuestionList();
+//        getRawQuestionList();
+//        getDataFromDB();
 
 
-        startTimer();
+//        startTimer();
         // initialize the random variable
 
         random = new Random();
-        quizzes = getLevelQuestion(3);
-        day = quizzes[random.nextInt(quizzes.length)];
 
-        txtQuestionContainer.setText(mixWords(day));
+//            quizzes = getLevelQuestion(3);
+//            day = quizzes.get(random.nextInt(quizzes.size()));
+//
+//            txtQuestionContainer.setText(mixWords(day));
+
 
         backgroundMp3 = MediaPlayer.create(this, R.raw.wii);
         backgroundMp3.start();
 
         timeCountDown = findViewById(R.id.timeCountDown);
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                getDataFromDB();
+//                btnCheck.setVisibility(View.VISIBLE);
+//                btnShow.setVisibility(View.VISIBLE);
+//                txtCorrectAnswer.setVisibility(View.VISIBLE);
+//                txtRightAnswer.setVisibility(View.VISIBLE);
+//                txtQuestionContainer.setVisibility(View.VISIBLE);
+//                txtScore.setVisibility(View.VISIBLE);
+////        timeCountDown.setVisibility(View.INVISIBLE);
+//                txtLevel.setVisibility(View.VISIBLE);
+//                etUserInput.setVisibility(View.VISIBLE);
+
+                quizzes = getLevelQuestion(3);
+                day = quizzes.get(random.nextInt(quizzes.size()));
+
+                txtQuestionContainer.setText(mixWords(day));
+                        startTimer();
+
+            }
+        });
 
         btnCheck.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,12 +196,9 @@ public class CorrectWordActivity extends AppCompatActivity {
                     playIncorrectSound();
                     etUserInput.setText("");
                     changeQuestion();
-//                    isFinish = true;
 
-
-//                    day = quizzes[random.nextInt(quizzes.length)];
-//                    txtQuestionContainer.setText(mixWords(day));
                 }
+                txtLevel.setText("Level: "+ levelQuestion);
                 timeCountDown.setText((" "));
                 countDown.cancel();
                 startTimer();
@@ -230,16 +275,15 @@ public class CorrectWordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 txtCorrectAnswer.setVisibility(View.VISIBLE);
                 txtRightAnswer.setVisibility(View.VISIBLE);
+//                getDataFromDB();
 
                 txtRightAnswer.setText(day);
-                getDataFromDB();
-
             }
         });
     }
 
     public void changeQuestion() {
-        day = quizzes[random.nextInt(quizzes.length)];
+        day = quizzes.get(random.nextInt(quizzes.size()));
         txtQuestionContainer.setText(mixWords(day));
     }
     private void startTimer() {
@@ -302,38 +346,40 @@ public class CorrectWordActivity extends AppCompatActivity {
         etUserInput = findViewById(R.id.etUserInput);
         btnCheck = findViewById(R.id.btnCheck);
         btnShow = findViewById(R.id.btnShow);
-//        btnNext = findViewById(R.id.btnNext);
+        btnStart = findViewById(R.id.btnStart);
+
+        txtLevel.setText("Level: "+ levelQuestion);
     }
 
-    private String[] getLevelQuestion(int level) {
+    private List<String> getLevelQuestion(int level) {
         questions.forEach(question -> {
             if(level == question.level ){
 
                 quizzes = question.question;
             }
         });
+//        Log.i("levelquizz", quizzes.toString());
+
         return quizzes;
     }
 
     private void getRawQuestionList() {
-        //        Question question = new Question(1, new String[]{"Hi","Hello"});
-        CorrectWord question2 = new CorrectWord(2, new String[]{"psyche", "stimulate"});
-        CorrectWord question3 = new CorrectWord(3, new String[]{"play", "opportunity"});
-        CorrectWord question4 = new CorrectWord(4, new String[]{"revolutionalise", "instinctively"});
-        CorrectWord question5 = new CorrectWord(5, new String[]{"overbearing", "interchange"});
-        CorrectWord question6 = new CorrectWord(6, new String[]{"Accomplishment", "psychological"});
+//                Question question = new Question(1, new String[]{"Hi","Hello"});
+        CorrectWord question2 = new CorrectWord(2, Arrays.asList("psyche", "stimulate"));
+        CorrectWord question3 = new CorrectWord(3, Arrays.asList("play", "opportunity"));
+        CorrectWord question4 = new CorrectWord(4, Arrays.asList("revolutionalise", "instinctively"));
+//        CorrectWord question5 = new CorrectWord(5, Arrays.asList("psyche", "stimulate")new String[]{"overbearing", "interchange"});
+//        CorrectWord question6 = new CorrectWord(6, Arrays.asList("psyche", "stimulate")new String[]{"Accomplishment", "psychological"});
 
-        questions.add(new CorrectWord(3, new String[]{"hi","hello"}));
+       // questions.add(new CorrectWord(3, new String[]{"hi","hello"}));
         questions.add(question2);
         questions.add(question3);
         questions.add(question4);
-        questions.add(question5);
-        questions.add(question6);
+//        questions.add(question5);
+//        questions.add(question);
     }
 
-    private void getDataFromDB() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("minhdoan");
-    }
+
+
+
 }

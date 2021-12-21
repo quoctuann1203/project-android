@@ -1,10 +1,13 @@
 package com.example.learnenglish2;
 
-public class CorrectWord {
-    int level;
-    String[] question;
+import java.io.Serializable;
+import java.util.List;
 
-    public CorrectWord(int level, String[] question) {
+public class CorrectWord implements Serializable {
+    int level;
+    List<String> question;
+
+    public CorrectWord(int level, List<String> question) {
         this.level = level;
         this.question = question;
     }
@@ -13,7 +16,7 @@ public class CorrectWord {
         return level;
     }
 
-    public String[] getQuestion() {
+    public List<String> getQuestion() {
         return question;
     }
 
@@ -21,7 +24,7 @@ public class CorrectWord {
         this.level = level;
     }
 
-    public void setQuestion(String[] question) {
+    public void setQuestion(List<String> question) {
         this.question = question;
     }
 
